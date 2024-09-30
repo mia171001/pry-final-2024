@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pago Exitoso</title>
+</head>
+<body>
+    <h1>¡Pago Exitoso!</h1>
+    <p>Gracias por tu compra. Tu pedido ha sido procesado.</p>
+    <a href="/">Regresar a la tienda</a>
+</body>
+<script>
+    window.onload = function() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const orderId = urlParams.get('orderId');
+      
+      if (orderId) {
+        localStorage.removeItem('cart');
+        console.log('Carrito limpiado después de la compra exitosa');
+      }
+    }
+  </script>
+  
+</html>

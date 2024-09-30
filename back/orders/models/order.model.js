@@ -26,9 +26,12 @@ const orderSchema= new Schema({
     },
     status:{
         type: String,
-        enum: ['pending', 'paid', 'shipped', 'delivered', 'cancelled'],
+        enum: ['pending', 'paid'],
         default: 'pending',
     },
+    sessionId: {
+        type: String, // Stripe Session ID
+      },
     paymentId: {
         type: String, // Stripe Payment ID
       },
@@ -45,6 +48,10 @@ orderSchema.virtual('id').get(function(){
 orderSchema.set('toJSON',{
     virtuals: true,
 });
+
+orderSchema.findById = function(cb){
+    return this.model('Orders').find({id: this.id}, cb);
+}
 
 const Order= mongoose.model('Orders',orderSchema);
 

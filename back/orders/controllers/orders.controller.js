@@ -2,63 +2,108 @@ const {Order}= require('../models/order.model');
 const Product = require('../../products/models/product.model');
 const User = require('../../users/models/user.model');
 
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY); // Asegúrate de configurar tu clave secreta de Stripe
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY); 
 
-exports.createOrder = async (req, res) => {
+
+exports.createCheckoutSession= async (req, res)=>{
   try {
-    const { userId, cartItems, paymentMethodId } = req.body;
-    const user = await User.findById(userId);
-    
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' });
+    const {carItems, userId}= req.body;
+console.log(req.body);
+    const user= await User.findById(userId);
+    if(!user){
+      return res.status(404).json({message:'User not found'});
+    }
+    let lineItems=[];
+    let totalAmount = 0;
+
+    for (let item of carItems){
+      const product= await Product.findById(item.productId);
+      if(!product){
+        return res.status(404).json({message:`Product ${item.productId} not found`});
+      }
+
+      if(product.stock<item.quantity){
+        return res.status(400).json({ message: `Insufficient stock for product ${product.name}` });
+      }
+
+      totalAmount+=product.precio*item.quantity;
+
+      lineItems.push({
+        price_data:{
+          currency:'pen',
+          product_data:{
+            name:product.name,
+            description:product.description,
+          },
+          unit_amount:product.precio*100,
+        },
+        quantity:item.quantity,
+      });
     }
 
-    let totalAmount = 0;
-    const products = await Promise.all(
-      cartItems.map(async (item) => {
-        const product = await Product.findById(item.productId);
-        if (!product) throw new Error(`Product ${item.productId} not found`);
-        if (product.stock < item.quantity) {
-          throw new Error(`Insufficient stock for product ${product.name}`);
-        }
-        totalAmount += product.precio * item.quantity;
-        return {
-          productId: product._id,
-          quantity: item.quantity,
-        };
-      })
-    );
-
-    // Crear el cargo en Stripe
-    const paymentIntent = await stripe.paymentIntents.create({
-      amount: totalAmount * 100, // Stripe maneja centavos
-      currency: 'pen',
-      payment_method: paymentMethodId,
-      confirm: true, // Confirmar el pago inmediatamente
+    const order = await Order.create({
+      userId:userId,
+      product:carItems,
+      totalAmount:totalAmount
     });
 
-    // Crear la orden
-    const order = new Order({
-      userId: userId,
-      products: products,
-      totalAmount: totalAmount,
-      paymentId: paymentIntent.id, // Guardar el ID del pago de Stripe
-      status: 'paid',
+
+    const session= await stripe.checkout.sessions.create({
+      payment_method_types:['card'],
+      line_items:lineItems,
+      mode:'payment',
+      success_url: `http://localhost:9090/success?orderId=${order._id}`, // Página de éxito
+      cancel_url: 'http://localhost:9090/cancel', // Página de cancelación
+      // customer_email:email
     });
 
+   
+
+    order.sessionId = session.id;
     await order.save();
 
-    // Reducir el stock de los productos
-    await Promise.all(
-      cartItems.map(async (item) => {
-        await Product.findByIdAndUpdate(item.productId, {
-          $inc: { stock: -item.quantity },
-        });
-      })
-    );
+    res.json({ id: session.id });
 
-    res.status(201).json({ message: 'Order created successfully', order });
+
+
   } catch (error) {
+    console.log(error);
     res.status(500).json({ message: error.message });
   }
-};
+}
+
+exports.markOrderAsPaid= async(orderId)=>{
+  try {
+    const order = await Order.findById(orderId).populate('product.productId');
+
+    if(!order){
+      throw new Error('Order not found');
+    }
+
+    for(let item of order.product){
+      const product= item.productId;
+
+      if (!product) {
+        throw new Error(`Product not found for ID: ${item.productId}`);
+      }
+
+      if(product.stock<item.quantity){
+        throw new Error(`Insufficient stock for product: ${product.name}`);
+      }
+
+      product.stock-=item.quantity;
+      await product.save();
+    }
+
+    
+
+    order.status='paid';
+    await order.save();
+    return order;
+
+  } catch (error) {
+    console.error('Error marking order as paid:', error);
+        throw error;
+  }
+}
+
