@@ -27,4 +27,9 @@ exports.routesConfig= function(app){
         res.sendFile(path.join(__dirname, '../public/success.html'));
     });
 
+    app.get('/my-orders',[
+        ValidationMiddleware.validJWTNeeded,
+        CheckoutController.getUserOrders
+    ]);
+
 };

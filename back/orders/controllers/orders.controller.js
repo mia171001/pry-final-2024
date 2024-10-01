@@ -107,3 +107,13 @@ exports.markOrderAsPaid= async(orderId)=>{
   }
 }
 
+exports.getUserOrders= async (req,res)=>{
+  try {
+    const userId= req.jwt.userId;
+    const orders = await Order.find({ userId: userId });
+        res.status(200).json(orders);
+    } catch (error) {
+        res.status(500).json({ message: 'Error al obtener las compras', error });
+    }
+}
+
