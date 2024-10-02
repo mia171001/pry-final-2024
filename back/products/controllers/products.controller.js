@@ -23,6 +23,29 @@ exports.list = (req, res) => {
         })
 };
 
+exports.listFilter = (req, res) => {
+    const filters = {};
+    if (req.query.categoria) {
+        
+        filters.categoria = req.query.categoria;
+
+        console.log(req.query.categoria);
+    }
+    if (req.query.minPrice && req.query.maxPrice) {
+        filters.precio = { $gte: req.query.minPrice, $lte: req.query.maxPrice };
+    }
+    if (req.query.name) {
+        filters.name = { $regex: req.query.name, $options: 'i' }; // Búsqueda por nombre
+    }
+    ProductModel.find(filters)
+        .then((products) => {
+            res.status(200).send(products);
+        })
+        .catch((err) => {
+            res.status(500).send({ message: err.message });
+        });
+};
+
 exports.getById = (req, res) => {
     ProductModel.findById(req.params.productId)
         .then((result) => {

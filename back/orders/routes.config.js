@@ -9,7 +9,7 @@ exports.routesConfig= function(app){
    
     app.post('/create-order',[ 
         ValidationMiddleware.validJWTNeeded,
-        // PermissionMiddleware.minimumPermissionLevelRequired(FREE),
+        PermissionMiddleware.minimumPermissionLevelRequired(FREE),
         CheckoutController.createCheckoutSession]);
 
     app.get('/success', async (req, res) => {
@@ -26,6 +26,10 @@ exports.routesConfig= function(app){
 
         res.sendFile(path.join(__dirname, '../public/success.html'));
     });
+
+    app.get('/cancel', async (req, res) => {
+        res.sendFile(path.join(__dirname, '../public/cancel.html'));
+    })
 
     app.get('/my-orders',[
         ValidationMiddleware.validJWTNeeded,

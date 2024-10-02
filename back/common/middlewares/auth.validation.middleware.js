@@ -30,6 +30,7 @@ exports.validJWTNeeded = (req, res, next) => {
                 return res.status(401).send();
             } else {
                 req.jwt = jwt.verify(authorization[1], secret);
+                console.log(req.jwt);
                 return next();
             }
 

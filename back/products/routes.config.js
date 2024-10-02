@@ -18,6 +18,10 @@ exports.routesConfig= function(app){
         ProductsController.list
     ]);
 
+    app.get('/productsfilter',[
+        ProductsController.listFilter
+    ]);
+
     app.get('/products/:productId',[
         ProductsController.getById
     ]);

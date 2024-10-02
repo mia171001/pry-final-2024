@@ -7,7 +7,8 @@ const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 exports.createCheckoutSession= async (req, res)=>{
   try {
-    const {carItems, userId}= req.body;
+    const {carItems}= req.body;
+    const userId= req.jwt.userId;
 console.log(req.body);
     const user= await User.findById(userId);
     if(!user){
@@ -54,7 +55,7 @@ console.log(req.body);
       mode:'payment',
       success_url: `http://localhost:9090/success?orderId=${order._id}`, // Página de éxito
       cancel_url: 'http://localhost:9090/cancel', // Página de cancelación
-      // customer_email:email
+      customer_email:req.jwt.email
     });
 
    

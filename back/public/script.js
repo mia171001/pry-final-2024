@@ -97,7 +97,7 @@ function mostrarModalLogin(){
                 // Guardar el token de sesión en sessionStorage
                 sessionStorage.setItem('sessionToken', data.accessToken);
                 sessionStorage.setItem('userId', data.userId);
-                console.log(data);
+                console.log('datosss',data);
                 return data.accessToken;
             }).catch(error => {
                 Swal.showValidationMessage(`Login failed: ${error}`);

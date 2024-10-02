@@ -25,9 +25,6 @@ productSchema.findById= function (cb){
 
 const Product = mongoose.model('Products',productSchema);
 
-exports.findByName=(name)=>{
-    return Product.find({name:name});
-}
 
 exports.findById=(id)=>{
     return Product.findById(id).
@@ -75,4 +72,8 @@ exports.removeById=(productId)=>{
             }
         });
     });
-}
+};
+
+exports.find = (filters) => {
+    return Product.find(filters);
+};
