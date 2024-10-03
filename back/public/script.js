@@ -3,7 +3,7 @@ let products=[];
 
 async function fetchProducts() {
     try {
-        const response = await fetch('http://localhost:9090/products'); // Cambia la URL según tu backend
+        const response = await fetch('https://pry-final-2024.onrender.com/products'); // Cambia la URL según tu backend
         products = await response.json();
         displayProducts(products);
     } catch (error) {
@@ -81,7 +81,7 @@ function mostrarModalLogin(){
             const password = Swal.getPopup().querySelector('#password').value;
             
             // Simular autenticación
-            return fetch('http://localhost:9090/auth', {
+            return fetch('https://pry-final-2024.onrender.com/auth', {
                 method: 'POST',
                 body: JSON.stringify({ email, password }),
                 headers: {
@@ -117,7 +117,7 @@ function iniciarProcesoPago() {
  console.log(userId);
     const cartItems = JSON.parse(localStorage.getItem('cart')) || [];
 
-    fetch('http://localhost:9090/create-order', {
+    fetch('https://pry-final-2024.onrender.com/create-order', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
