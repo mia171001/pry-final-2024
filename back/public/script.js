@@ -51,6 +51,10 @@ console.log("productadd",product);
         }
         productInCart.quantity += 1;
     }else{
+        if(product.stock<=0){
+            alert('No se puede añadir más de este producto, no hay suficiente stock.');
+            return;
+        }
         cart.push({ productId: productId, quantity: 1 }); 
     }
 
