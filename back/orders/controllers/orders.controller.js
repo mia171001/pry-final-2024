@@ -53,8 +53,8 @@ console.log(req.body);
       payment_method_types:['card'],
       line_items:lineItems,
       mode:'payment',
-      success_url: `http://localhost:9090/success?orderId=${order._id}`, // Página de éxito
-      cancel_url: 'http://localhost:9090/cancel', // Página de cancelación
+      success_url: `https://pry-final-2024.onrender.com/success?orderId=${order._id}`, // Página de éxito
+      cancel_url: 'https://pry-final-2024.onrender.com/cancel', // Página de cancelación
       customer_email:req.jwt.email
     });
 

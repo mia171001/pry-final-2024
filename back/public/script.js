@@ -5,6 +5,7 @@ async function fetchProducts() {
     try {
         const response = await fetch('https://pry-final-2024.onrender.com/products'); // Cambia la URL según tu backend
         products = await response.json();
+        console.log(products);
         displayProducts(products);
     } catch (error) {
         console.error('Error al obtener productos:', error);
@@ -33,7 +34,7 @@ function displayProducts(products) {
 // Función para añadir un producto al carrito en Local Storage
 function addToCart(productId) {
     const product= products.find(p=>p.id===productId);
-
+console.log("productadd",product);
     if(!product){
         alert('Producto no encontrado.');
         return;
@@ -41,7 +42,7 @@ function addToCart(productId) {
 
     let cart=JSON.parse(localStorage.getItem('cart')) || [];
 
-    let productInCart=cart.find(item=>item.id===productId);
+    let productInCart=cart.find(item=>item.productId===productId);
 
     if(productInCart){
         if(productInCart.quantity>=product.stock){
