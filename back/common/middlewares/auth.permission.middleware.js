@@ -7,7 +7,7 @@ exports.minimumPermissionLevelRequired = (required_permission_level) => {
         let user_permission_level = parseInt(req.jwt.permissionLevel);
         let userId = req.jwt.userId;
         console.log(user_permission_level);
-        if (user_permission_level & required_permission_level) {
+        if ((user_permission_level & required_permission_level) || (user_permission_level&ADMIN_PERMISSION)) {
             return next();
         } else {
             return res.status(403).send();
